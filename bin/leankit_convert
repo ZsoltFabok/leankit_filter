@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+
+require "leankit_convert"
+LeankitConvert::Runner.run ARGV
