@@ -39,7 +39,7 @@ def add_board_column_mapping_to_config_file(board_name, mapping)
 end
 
 def run_app(argv)
-  LeankitConvert::Runner.run argv
+  LeankitConvert::Cli.run argv
 end
 
 def read_file(file_name)

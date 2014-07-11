@@ -1,17 +1,31 @@
 module LeankitConvert
-  class DumpToCsv
+  class ProcessBoard
     def initialize(files_and_json, csv_file)
       @files_and_json = files_and_json
       @csv_file = csv_file
     end
 
-    def convert(location, board_name, mapping)
-      Dir.foreach(File.join(location, board_name)) do |file_name|
+    def process(boards_json, board_dump_location)
+      board_name = File.basename(board_dump_location)
+      content = @files_and_json.from_file(boards_json)
+      mapping = nil
+      content["boards"].each do |board, mapping_|
+        if board == board_name
+          mapping = mapping_
+          break
+        end
+      end
+
+      to_csv(board_dump_location, board_name, mapping)
+    end
+
+    def to_csv(board_dump_location, board_name, mapping)
+      Dir.foreach(board_dump_location) do |file_name|
         if file_name =~ /([0-9]+)_history.json/
           card_id = $1
           # FIXME: hard coded header -> not cool
-          @csv_file.open(File.join(location,"#{board_name}.csv"), [:id, :committed, :started, :finished])
-          history_file_location = File.join(location, board_name, "#{card_id}_history.json")
+          @csv_file.open(File.join(File.split(board_dump_location)[0], "#{board_name}.csv"), [:id, :committed, :started, :finished])
+          history_file_location = File.join(board_dump_location, "#{card_id}_history.json")
           if File.exists?(history_file_location)
             entry = {id: card_id}
             history = @files_and_json.from_file(history_file_location)[0]
@@ -32,6 +46,10 @@ module LeankitConvert
           @csv_file.close
         end
       end
+    end
+
+    def self.create
+      new(Common::FilesAndJson.new, CsvFile.new)
     end
 
     private
