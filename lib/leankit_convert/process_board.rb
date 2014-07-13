@@ -25,21 +25,26 @@ module LeankitConvert
         if file_name =~ /([0-9]+)_history.json/
           card_id = $1
           # FIXME: hard coded header -> not cool
-          @csv_file.open(csv_file_location, [:id, :committed, :started, :finished])
+          @csv_file.open(csv_file_location, [:id, :backlog, :committed, :started, :finished])
           history_file_location = File.join(board_dump_location, "#{card_id}_history.json")
           if File.exists?(history_file_location)
             entry = {id: card_id}
             history = @files_and_json.from_file(history_file_location)[0]
-            started_index = find_started(history, mapping)
-            if started_index
-              entry[:started] = get_date(history[started_index])
-              committed_index = find_committed_before_started(history, mapping, started_index)
-              if committed_index
-                entry[:committed] = get_date(history[committed_index])
-              end
-              finished_index = find_finished(history, mapping)
-              if finished_index && finished_index > find_last_ongoing(history, mapping)
-                entry[:finished] = get_date(history[finished_index])
+            backlog_index = find_backlog(history, mapping)
+            if backlog_index
+              entry[:backlog] = get_date(history[backlog_index])
+
+              started_index = find_started(history, mapping)
+              if started_index
+                entry[:started] = get_date(history[started_index])
+                committed_index = find_committed_before_started(history, mapping, started_index)
+                if committed_index
+                  entry[:committed] = get_date(history[committed_index])
+                end
+                finished_index = find_finished(history, mapping)
+                if finished_index && finished_index > find_last_ongoing(history, mapping)
+                  entry[:finished] = get_date(history[finished_index])
+                end
               end
             end
             @csv_file.put(entry)
@@ -60,9 +65,11 @@ module LeankitConvert
     end
 
     def matching_event?(entry, patterns)
-      patterns.each do |pattern|
-        if entry["ToLaneTitle"] =~ Regexp.new(pattern)
-          return true
+      if patterns && !patterns.empty?
+        patterns.each do |pattern|
+          if entry["ToLaneTitle"] =~ Regexp.new(pattern)
+            return true
+          end
         end
       end
       false
@@ -94,6 +101,10 @@ module LeankitConvert
       find_last_entry_in_history(history, mapping[:finished.to_s])
     end
 
+    def find_backlog(history, mapping)
+      find_first_entry_in_history(history, mapping[:backlog.to_s])
+    end
+
     def find_last_ongoing(history, mapping)
       find_last_entry_in_history(history, mapping[:started.to_s])
     end
@@ -102,6 +113,15 @@ module LeankitConvert
       history.reverse.each_with_index do |entry, index|
         if relevant_event?(entry) && matching_event?(entry, pattern)
           return history.length - 1 - index
+        end
+      end
+      nil
+    end
+
+    def find_first_entry_in_history(history, pattern)
+      history.each_with_index do |entry, index|
+        if relevant_event?(entry) && matching_event?(entry, pattern)
+          return index
         end
       end
       nil
