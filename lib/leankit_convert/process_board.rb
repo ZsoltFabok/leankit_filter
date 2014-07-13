@@ -20,11 +20,12 @@ module LeankitConvert
     end
 
     def to_csv(board_dump_location, board_name, mapping)
+      csv_file_location = File.join(File.split(board_dump_location)[0], "#{board_name}.csv")
       Dir.foreach(board_dump_location) do |file_name|
         if file_name =~ /([0-9]+)_history.json/
           card_id = $1
           # FIXME: hard coded header -> not cool
-          @csv_file.open(File.join(File.split(board_dump_location)[0], "#{board_name}.csv"), [:id, :committed, :started, :finished])
+          @csv_file.open(csv_file_location, [:id, :committed, :started, :finished])
           history_file_location = File.join(board_dump_location, "#{card_id}_history.json")
           if File.exists?(history_file_location)
             entry = {id: card_id}
@@ -46,6 +47,7 @@ module LeankitConvert
           @csv_file.close
         end
       end
+      csv_file_location
     end
 
     def self.create

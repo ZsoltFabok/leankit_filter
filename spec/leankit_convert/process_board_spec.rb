@@ -26,7 +26,10 @@ describe LeankitConvert::ProcessBoard do
         expect(@csv_file).to receive(:open).with("#{@dump_location}/#{@board_name}.csv", [:id, :committed, :started, :finished])
         expect(@csv_file).to receive(:put).with({id: "#{@card_id}", committed: "2013-09-16", started: "2013-09-17", finished: "2013-09-18"})
         expect(@csv_file).to receive(:close)
-    		LeankitConvert::ProcessBoard.new(@files_and_json, @csv_file).to_csv(@location, @board_name, @mapping)
+
+    		csv_location = LeankitConvert::ProcessBoard.new(@files_and_json, @csv_file).to_csv(@location, @board_name, @mapping)
+
+        expect(csv_location).to eql("#{@dump_location}/#{@board_name}.csv")
     	end
 
       it "recognises creation event" do
