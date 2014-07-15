@@ -8,12 +8,12 @@ require 'leankit_convert/version'
 Gem::Specification.new do |s|
   s.name        = 'leankit_convert'
   s.version     = LeankitConvert::VERSION
-  s.date        = '2014-01-15'
+  s.date        = '2014-07-15'
   s.summary     = "leankit_convert-#{s.version}"
-  s.description = "converts leankit json to other formats"
+  s.description = "Converts leankit json to other formats"
   s.authors     = ["Zsolt Fabok"]
   s.email       = 'me@zsoltfabok.com'
-  s.homepage    = ''
+  s.homepage    = 'https://github.com/ZsoltFabok/leankit_convert'
   s.license     = 'BSD'
 
   s.files         = `git ls-files`.split("\n").reject {|path| path =~ /\.gitignore$/ || path =~ /file$/ }
