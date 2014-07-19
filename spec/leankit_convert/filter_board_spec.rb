@@ -13,11 +13,12 @@ describe LeankitFilter::FilterBoard do
       @location = File.join(@dump_location, @board_location)
       @board_name = "board"
       @card_id = "1034204"
+      @card_type = "dev"
       @mapping = {"backlog" => ["Backlog"], "committed" => ["TODO"], "started" => ["^DOING:"], "finished" => ["DONE"]}
-      @card_info = [{"Id" => @card_id, "Size" => 0}]
+      @card_info = [{"Id" => @card_id, "Size" => 0, "TypeName" => @card_type}]
     end
 
-    describe "#process" do
+    describe "#filter" do
     	it "collects backlog, committed, started and finished" do
     		@card_history = [[
           {"CardId" => @card_id, "Type" => "CardCreationEventDTO", "ToLaneTitle" => "Backlog", "DateTime"=>"2013/09/15 at 03:10:44 PM"},
@@ -29,7 +30,7 @@ describe LeankitFilter::FilterBoard do
         mock_read_boards_json
 
         result = LeankitFilter::FilterBoard.new(@files_and_json).filter("boards.json", @location)
-        expect(result).to eq [@board_name, [{:id => @card_id,
+        expect(result).to eq [@board_name, [{:id => @card_id, :type => @card_type,
           :backlog => "2013-09-15", :committed => "2013-09-16", :started => "2013-09-17", :finished => "2013-09-18"}]]
     	end
 
@@ -43,7 +44,7 @@ describe LeankitFilter::FilterBoard do
         mock_read_boards_json
 
         result = LeankitFilter::FilterBoard.new(@files_and_json).filter("boards.json", @location)
-        expect(result).to eq [@board_name, [{:id => @card_id,
+        expect(result).to eq [@board_name, [{:id => @card_id, :type => @card_type,
           :backlog => "2013-09-15", :committed => "2013-09-16", :started => "2013-09-17", :finished => "2013-09-18"}]]
       end
 
@@ -58,7 +59,7 @@ describe LeankitFilter::FilterBoard do
         mock_read_boards_json
 
     		result = LeankitFilter::FilterBoard.new(@files_and_json).filter("boards.json", @location)
-        expect(result).to eq [@board_name, [{:id => @card_id,
+        expect(result).to eq [@board_name, [{:id => @card_id, :type => @card_type,
           :backlog => "2013-09-15", :committed => "2013-09-16", :started => "2013-09-17", :finished => "2013-09-19"}]]
     	end
 
@@ -73,7 +74,7 @@ describe LeankitFilter::FilterBoard do
         mock_read_boards_json
 
     		result = LeankitFilter::FilterBoard.new(@files_and_json).filter("boards.json", @location)
-        expect(result).to eq [@board_name, [{:id => @card_id,
+        expect(result).to eq [@board_name, [{:id => @card_id, :type => @card_type,
           :backlog => "2013-09-15", :committed => "2013-09-16", :started => "2013-09-17", :finished => "2013-09-18"}]]
     	end
 
@@ -89,7 +90,7 @@ describe LeankitFilter::FilterBoard do
         mock_read_boards_json
 
         result = LeankitFilter::FilterBoard.new(@files_and_json).filter("boards.json", @location)
-        expect(result).to eq [@board_name, [{:id => @card_id,
+        expect(result).to eq [@board_name, [{:id => @card_id, :type => @card_type,
           :backlog => "2013-09-15", :committed => "2013-09-18", :started => "2013-09-18", :finished => "2013-09-19"}]]
       end
 
@@ -104,7 +105,7 @@ describe LeankitFilter::FilterBoard do
         mock_read_boards_json
 
         result = LeankitFilter::FilterBoard.new(@files_and_json).filter("boards.json", @location)
-        expect(result).to eq [@board_name, [{:id => @card_id,
+        expect(result).to eq [@board_name, [{:id => @card_id, :type => @card_type,
           :backlog => "2013-09-15", :committed => "2013-09-16", :started => "2013-09-18", :finished => "2013-09-19"}]]
       end
 
@@ -119,7 +120,7 @@ describe LeankitFilter::FilterBoard do
         mock_read_boards_json
 
         result = LeankitFilter::FilterBoard.new(@files_and_json).filter("boards.json", @location)
-        expect(result).to eq [@board_name, [{:id => @card_id,
+        expect(result).to eq [@board_name, [{:id => @card_id, :type => @card_type,
           :backlog => "2013-09-15", :committed => "2013-09-16", :started => "2013-09-18"}]]
       end
 
@@ -134,14 +135,11 @@ describe LeankitFilter::FilterBoard do
         mock_read_boards_json
 
         result = LeankitFilter::FilterBoard.new(@files_and_json).filter("boards.json", @location)
-        expect(result).to eq [@board_name, [{:id => @card_id,
+        expect(result).to eq [@board_name, [{:id => @card_id, :type => @card_type,
           :backlog => "2013-09-15", :committed => "2013-09-16", :started => "2013-09-18"}]]
       end
 
-      it "collects card size" do
-      end
-
-      it "recognises card size from change event" do
+      it "collects the card size from the info" do
         card_size = 3
         @card_info[0]["Size"] = card_size
         @card_history = [[
@@ -151,7 +149,7 @@ describe LeankitFilter::FilterBoard do
         mock_read_boards_json
 
         result = LeankitFilter::FilterBoard.new(@files_and_json).filter("boards.json", @location)
-        expect(result).to eq [@board_name, [{:id => @card_id,
+        expect(result).to eq [@board_name, [{:id => @card_id, :type => @card_type,
           :backlog => "2013-09-15", :size => card_size}]]
       end
     end

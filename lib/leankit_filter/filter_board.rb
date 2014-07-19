@@ -32,6 +32,7 @@ module LeankitFilter
         work_item.merge!(get_first_appearance_date(:started, content[:history], mapping))
         work_item.merge!(find_finished(content[:history], mapping))
         work_item.merge!(get_card_size(content[:info]))
+        work_item.merge!(get_card_type(content[:info]))
         work_items << work_item
       end
       work_items
@@ -143,6 +144,10 @@ module LeankitFilter
       else
         {}
       end
+    end
+
+    def get_card_type(info)
+      {:type => info["TypeName"]}
     end
   end
 end
