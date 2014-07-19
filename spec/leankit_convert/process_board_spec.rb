@@ -14,23 +14,16 @@ describe LeankitFilter::ProcessBoard do
       @mapping = {"backlog" => ["Backlog"], "committed" => ["TODO"], "started" => ["^DOING:"], "finished" => ["DONE"]}
     end
 
-    describe "#to_csv" do
+    describe "#process" do
     	it "writes the committed, started, and finished to the csv" do
     		@card_history = [[
           {"CardId" => @card_id, "Type" => "CardCreationEventDTO", "ToLaneTitle" => "Backlog", "DateTime"=>"2013/09/15 at 03:10:44 PM"},
           {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "TODO", "DateTime"=>"2013/09/16 at 03:10:44 PM"},
           {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "DOING: Do", "DateTime"=>"2013/09/17 at 03:10:48 PM"},
           {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "DONE", "DateTime"=>"2013/09/18 at 03:10:48 PM"}]]
-        expect(Dir).to receive(:foreach).with("#{@location}").and_yield("#{@card_id}.json").and_yield("#{@card_id}_history.json")
-        expect(File).to receive(:exists?).with("#{@location}/#{@card_id}_history.json").and_return(true)
-        expect(@files_and_json).to receive(:from_file).with("#{@location}/#{@card_id}_history.json").and_return(@card_history)
-        expect(@csv_file).to receive(:open).with("#{@dump_location}/#{@board_name}.csv", [:id, :backlog, :committed, :started, :finished])
-        expect(@csv_file).to receive(:put).with({id: "#{@card_id}", :backlog=>"2013-09-15", committed: "2013-09-16", started: "2013-09-17", finished: "2013-09-18"})
-        expect(@csv_file).to receive(:close)
-
-    		csv_location = LeankitFilter::ProcessBoard.new(@files_and_json, @csv_file).to_csv(@location, @board_name, @mapping)
-
-        expect(csv_location).to eql("#{@dump_location}/#{@board_name}.csv")
+        mock_card_info_and_history
+        mock_read_boards_json
+        should_write_the_following_dates_to_csv("2013-09-15", "2013-09-16", "2013-09-16", "2013-09-17")
     	end
 
       it "recognises creation event" do
@@ -40,8 +33,9 @@ describe LeankitFilter::ProcessBoard do
           {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "DOING: Do", "DateTime"=>"2013/09/17 at 03:10:48 PM"},
           {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "DONE", "DateTime"=>"2013/09/18 at 03:10:48 PM"}]]
         mock_card_info_and_history
+        mock_read_boards_json
         should_write_the_following_dates_to_csv("2013-09-15", "2013-09-16", "2013-09-17", "2013-09-18")
-        LeankitFilter::ProcessBoard.new(@files_and_json, @csv_file).to_csv(@location, @board_name, @mapping)
+        LeankitFilter::ProcessBoard.new(@files_and_json).process("boards.json", @location)
       end
 
     	it "considers the first ongoing history entry" do
@@ -52,8 +46,9 @@ describe LeankitFilter::ProcessBoard do
           {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "DOING: Review", "DateTime"=>"2013/09/18 at 03:16:48 PM"},
           {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "DONE", "DateTime"=>"2013/09/19 at 03:10:48 PM"}]]
         mock_card_info_and_history
+        mock_read_boards_json
         should_write_the_following_dates_to_csv("2013-09-15", "2013-09-16", "2013-09-17", "2013-09-19")
-    		LeankitFilter::ProcessBoard.new(@files_and_json, @csv_file).to_csv(@location, @board_name, @mapping)
+    		LeankitFilter::ProcessBoard.new(@files_and_json).process("boards.json", @location)
     	end
 
     	it "considers the last done history entry if there are more than one" do
@@ -64,8 +59,9 @@ describe LeankitFilter::ProcessBoard do
           {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "DONE", "DateTime"=>"2013/09/18 at 03:16:48 PM"},
           {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "DONE", "DateTime"=>"2013/09/19 at 03:10:48 PM"}]]
         mock_card_info_and_history
+        mock_read_boards_json
         should_write_the_following_dates_to_csv("2013-09-15", "2013-09-16", "2013-09-17", "2013-09-19")
-    		LeankitFilter::ProcessBoard.new(@files_and_json, @csv_file).to_csv(@location, @board_name, @mapping)
+    		LeankitFilter::ProcessBoard.new(@files_and_json).process("boards.json", @location)
     	end
 
       it "should consider the last committed entry if it moved between TODO and Backlog before" do
@@ -77,8 +73,9 @@ describe LeankitFilter::ProcessBoard do
           {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "DOING:", "DateTime"=>"2013/09/18 at 03:16:48 PM"},
           {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "DONE", "DateTime"=>"2013/09/19 at 03:10:48 PM"}]]
         mock_card_info_and_history
+        mock_read_boards_json
         should_write_the_following_dates_to_csv("2013-09-15", "2013-09-18", "2013-09-18", "2013-09-19")
-        LeankitFilter::ProcessBoard.new(@files_and_json, @csv_file).to_csv(@location, @board_name, @mapping)
+        LeankitFilter::ProcessBoard.new(@files_and_json).process("boards.json", @location)
       end
 
       it "ignores the move in the same column" do
@@ -89,8 +86,9 @@ describe LeankitFilter::ProcessBoard do
           {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "DOING:", "DateTime"=>"2013/09/19 at 03:16:48 PM"},
           {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "DONE", "DateTime"=>"2013/09/19 at 03:10:48 PM"}]]
         mock_card_info_and_history
+        mock_read_boards_json
         should_write_the_following_dates_to_csv("2013-09-15", "2013-09-16", "2013-09-18", "2013-09-19")
-        LeankitFilter::ProcessBoard.new(@files_and_json, @csv_file).to_csv(@location, @board_name, @mapping)
+        LeankitFilter::ProcessBoard.new(@files_and_json).process("boards.json", @location)
       end
 
       it "is able to handle items moving back actions" do
@@ -101,8 +99,9 @@ describe LeankitFilter::ProcessBoard do
           {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "DOING:", "DateTime"=>"2013/09/19 at 03:16:48 PM"},
           {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "TODO", "DateTime"=>"2013/09/19 at 03:10:48 PM"}]]
         mock_card_info_and_history
+        mock_read_boards_json
         should_write_the_following_dates_to_csv("2013-09-15", "2013-09-16", "2013-09-18")
-        LeankitFilter::ProcessBoard.new(@files_and_json, @csv_file).to_csv(@location, @board_name, @mapping)
+        LeankitFilter::ProcessBoard.new(@files_and_json).process("boards.json", @location)
       end
 
       it "does not recognise done if it was moved back from the done column" do
@@ -113,8 +112,9 @@ describe LeankitFilter::ProcessBoard do
           {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "DONE", "DateTime"=>"2013/09/19 at 03:16:48 PM"},
           {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "DOING:", "DateTime"=>"2013/09/19 at 03:10:48 PM"}]]
         mock_card_info_and_history
+        mock_read_boards_json
         should_write_the_following_dates_to_csv("2013-09-15", "2013-09-16", "2013-09-18")
-        LeankitFilter::ProcessBoard.new(@files_and_json, @csv_file).to_csv(@location, @board_name, @mapping)
+        LeankitFilter::ProcessBoard.new(@files_and_json).process("boards.json", @location)
       end
 
       it "handles portofolio boards" # do
@@ -148,6 +148,11 @@ describe LeankitFilter::ProcessBoard do
       allow(@files_and_json).to receive(:from_file).with("#{@location}/#{@card_id}_history.json").and_return(@card_history)
     end
 
+    def mock_read_boards_json
+      allow(@files_and_json).to receive(:from_file).with("boards.json").and_return({"boards" => {@board_name => @mapping}})
+    end
+
+
     def should_write_the_following_dates_to_csv(*dates)
       allow(@csv_file).to receive(:open).with("#{@dump_location}/#{@board_name}.csv", [:id, :backlog, :committed, :started, :finished])
       if dates[3]
@@ -169,11 +174,19 @@ describe LeankitFilter::ProcessBoard do
       go_back
     end
 
-    it "writes the committed, started, and finished to the csv file" do
+    it "csv is the default renderer" do
       add_board_column_mapping_to_config_file("board", \
         {"backlog" => ["Backlog"], "committed" => ["TODO"], "started" => ["^DOING:"], "finished" => ["DONE"]})
       copy_card_files("board", 5252, 7027)
       run_app(["boards.json", "leankit_dump/board"])
+      files_are_the_same("leankit_dump/board.csv", "5252.csv")
+    end
+
+    it "writes the committed, started, and finished to the csv file" do
+      add_board_column_mapping_to_config_file("board", \
+        {"backlog" => ["Backlog"], "committed" => ["TODO"], "started" => ["^DOING:"], "finished" => ["DONE"]})
+      copy_card_files("board", 5252, 7027)
+      run_app(["--csv", "boards.json", "leankit_dump/board"])
       files_are_the_same("leankit_dump/board.csv", "5252.csv")
     end
   end
