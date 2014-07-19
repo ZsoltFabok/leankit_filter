@@ -25,27 +25,36 @@ module LeankitFilter
     private
     def get_work_items(board_dump_location, board_name, mapping)
       work_items = []
-      find_history_files(board_dump_location, board_name).each do |card_id, history_file_location|
+      work_item_data(board_dump_location, board_name).each do |card_id, content|
         work_item = {:id => card_id}
-        history = @files_and_json.from_file(history_file_location)[0]
-        work_item.merge!(get_first_appearance_date(:backlog, history, mapping))
-        work_item.merge!(find_committed(history, mapping))
-        work_item.merge!(get_first_appearance_date(:started, history, mapping))
-        work_item.merge!(find_finished(history, mapping))
+        work_item.merge!(get_first_appearance_date(:backlog, content[:history], mapping))
+        work_item.merge!(find_committed(content[:history], mapping))
+        work_item.merge!(get_first_appearance_date(:started, content[:history], mapping))
+        work_item.merge!(find_finished(content[:history], mapping))
+        work_item.merge!(get_card_size(content[:info]))
         work_items << work_item
       end
       work_items
     end
 
-    def find_history_files(board_dump_location, board_name)
-      files = []
+    def work_item_data(board_dump_location, board_name)
+      work_item_data = {}
       Dir.foreach(board_dump_location) do |file_name|
-        if file_name =~ /([0-9]+)_history.json/
+        if file_name =~ /([0-9]+)(_history)?.json/
           card_id = $1
-          files << [card_id, File.join(board_dump_location, "#{card_id}_history.json")]
+          if !work_item_data.has_key?(card_id)
+            work_item_data[card_id] = {}
+          end
+
+          content = @files_and_json.from_file(File.join(board_dump_location, file_name))
+          if file_name.include?("history")
+            work_item_data[card_id][:history] = content[0]
+          else
+            work_item_data[card_id][:info] = content[0]
+          end
         end
       end
-      files
+      work_item_data
     end
 
     def relevant_event?(entry)
@@ -125,6 +134,15 @@ module LeankitFilter
         end
       end
       return {}
+    end
+
+    def get_card_size(info)
+      size = info["Size"]
+      if size != 0
+        {:size => size}
+      else
+        {}
+      end
     end
   end
 end

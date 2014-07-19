@@ -25,7 +25,7 @@ module LeankitFilter
     def self.save_to_csv(board_dump_location, board_name, work_items)
       csv_file = CsvFile.new
       csv_file_location = File.join(File.split(board_dump_location)[0], "#{board_name}.csv")
-      csv_file.open(csv_file_location, [:id, :backlog, :committed, :started, :finished])
+      csv_file.open(csv_file_location, [:id, :backlog, :committed, :started, :finished, :size])
       work_items.each do |entry|
         csv_file.put(entry)
       end

@@ -14,6 +14,7 @@ describe LeankitFilter::FilterBoard do
       @board_name = "board"
       @card_id = "1034204"
       @mapping = {"backlog" => ["Backlog"], "committed" => ["TODO"], "started" => ["^DOING:"], "finished" => ["DONE"]}
+      @card_info = [{"Id" => @card_id, "Size" => 0}]
     end
 
     describe "#process" do
@@ -136,12 +137,29 @@ describe LeankitFilter::FilterBoard do
         expect(result).to eq [@board_name, [{:id => @card_id,
           :backlog => "2013-09-15", :committed => "2013-09-16", :started => "2013-09-18"}]]
       end
+
+      it "collects card size" do
+      end
+
+      it "recognises card size from change event" do
+        card_size = 3
+        @card_info[0]["Size"] = card_size
+        @card_history = [[
+          {"CardId" => @card_id, "Type" => "CardCreationEventDTO", "ToLaneTitle" => "Backlog", "DateTime"=>"2013/09/15 at 03:10:44 PM"},
+          {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "TODO", "DateTime"=>"2013/09/16 at 03:10:44 PM"}]]
+        mock_card_info_and_history
+        mock_read_boards_json
+
+        result = LeankitFilter::FilterBoard.new(@files_and_json).filter("boards.json", @location)
+        expect(result).to eq [@board_name, [{:id => @card_id,
+          :backlog => "2013-09-15", :size => card_size}]]
+      end
     end
 
     def mock_card_info_and_history
-      allow(Dir).to receive(:foreach).with("#{@location}").and_yield("#{@card_id}.json")
-      allow(Dir).to receive(:foreach).with("#{@location}").and_yield("#{@card_id}_history.json")
+      allow(Dir).to receive(:foreach).with("#{@location}").and_yield("#{@card_id}.json").and_yield("#{@card_id}_history.json")
       allow(File).to receive(:exists?).with("#{@location}/#{@card_id}_history.json").and_return(true)
+      allow(@files_and_json).to receive(:from_file).with("#{@location}/#{@card_id}.json").and_return(@card_info)
       allow(@files_and_json).to receive(:from_file).with("#{@location}/#{@card_id}_history.json").and_return(@card_history)
     end
 
