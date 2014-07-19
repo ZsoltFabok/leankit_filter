@@ -1,4 +1,4 @@
-module LeankitConvert
+module LeankitFilter
   class ProcessBoard
     def initialize(files_and_json, csv_file)
       @files_and_json = files_and_json

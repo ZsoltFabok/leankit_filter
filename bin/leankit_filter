@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+
+require "leankit_filter"
+LeankitFilter::Cli.run ARGV

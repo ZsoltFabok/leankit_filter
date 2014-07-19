@@ -1,11 +1,11 @@
 require 'spec_helper_with_integration'
 
-describe LeankitConvert::CsvFile do
+describe LeankitFilter::CsvFile do
   context "integration" do
     before(:each) do
       clean_test_data
       go_to_test_dir
-      @file = LeankitConvert::CsvFile.new
+      @file = LeankitFilter::CsvFile.new
       @file_name = "a.csv"
     end
 

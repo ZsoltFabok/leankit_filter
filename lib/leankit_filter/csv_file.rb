@@ -1,6 +1,6 @@
 require 'csv'
 
-module LeankitConvert
+module LeankitFilter
   class CsvFile
     def open(file_name, header)
       @file_name = file_name

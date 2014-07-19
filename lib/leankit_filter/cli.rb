@@ -1,4 +1,4 @@
-module LeankitConvert
+module LeankitFilter
   class Cli
     def self.run(argv)
     	boards_json = argv[0]

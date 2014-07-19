@@ -1,13 +1,13 @@
-### Leankit Convert
-[![Build Status](https://travis-ci.org/ZsoltFabok/leankit_convert.png)](https://travis-ci.org/ZsoltFabok/leankit_convert)
-[![Dependency Status](https://gemnasium.com/ZsoltFabok/leankit_convert.png)](https://gemnasium.com/ZsoltFabok/leankit_convert)
-[![Code Climate](https://codeclimate.com/github/ZsoltFabok/leankit_convert.png)](https://codeclimate.com/github/ZsoltFabok/leankit_convert)
-[![Coverage Status](https://coveralls.io/repos/ZsoltFabok/leankit_convert/badge.png?branch=master)](https://coveralls.io/r/ZsoltFabok/leankit_convert?branch=master)
+### Leankit Filter
+[![Build Status](https://travis-ci.org/ZsoltFabok/leankit_filter.png)](https://travis-ci.org/ZsoltFabok/leankit_filter)
+[![Dependency Status](https://gemnasium.com/ZsoltFabok/leankit_filter.png)](https://gemnasium.com/ZsoltFabok/leankit_filter)
+[![Code Climate](https://codeclimate.com/github/ZsoltFabok/leankit_filter.png)](https://codeclimate.com/github/ZsoltFabok/leankit_filter)
+[![Coverage Status](https://coveralls.io/repos/ZsoltFabok/leankit_filter/badge.png?branch=master)](https://coveralls.io/r/ZsoltFabok/leankit_filter?branch=master)
 
-Converts Leankit json to other formats.
+Filters out information from downloaded Leankit card histories.
 
 #### Install
-    gem install leankit_convert
+    gem install leankit_filter
 
 #### Usage
 
@@ -26,11 +26,11 @@ First you will need a `boards.json` file that tells the application how to find 
 
 For command line:
 
-     leankit_convert <boards.json location> <destination>
+     leankit_filter <boards.json location> <destination>
 
 For ruby code:
 
-    require 'leankit_convert'
+    require 'leankit_filter'
 
     locations = []
     process_board = LeankitConvert::ProcessBoard.create

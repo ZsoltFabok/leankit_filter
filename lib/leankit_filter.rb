@@ -8,5 +8,5 @@ def load_module(module_name)
   end
 end
 
-load_module("leankit_convert")
+load_module("leankit_filter")
 load_module("common")

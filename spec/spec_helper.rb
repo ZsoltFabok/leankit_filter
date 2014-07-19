@@ -16,4 +16,4 @@ SimpleCov.start do
   add_filter '/spec/'
 end
 
-require File.expand_path('../../lib/leankit_convert', __FILE__)
+require File.expand_path('../../lib/leankit_filter', __FILE__)

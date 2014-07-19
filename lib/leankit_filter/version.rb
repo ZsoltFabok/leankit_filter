@@ -1,3 +1,3 @@
-module LeankitConvert
+module LeankitFilter
   VERSION = '0.1.0'
 end

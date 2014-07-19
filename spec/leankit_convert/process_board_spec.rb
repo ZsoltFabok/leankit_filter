@@ -1,6 +1,6 @@
 require 'spec_helper_with_integration'
 
-describe LeankitConvert::ProcessBoard do
+describe LeankitFilter::ProcessBoard do
   context "unit" do
   	before(:each) do
       @files_and_json = double
@@ -28,7 +28,7 @@ describe LeankitConvert::ProcessBoard do
         expect(@csv_file).to receive(:put).with({id: "#{@card_id}", :backlog=>"2013-09-15", committed: "2013-09-16", started: "2013-09-17", finished: "2013-09-18"})
         expect(@csv_file).to receive(:close)
 
-    		csv_location = LeankitConvert::ProcessBoard.new(@files_and_json, @csv_file).to_csv(@location, @board_name, @mapping)
+    		csv_location = LeankitFilter::ProcessBoard.new(@files_and_json, @csv_file).to_csv(@location, @board_name, @mapping)
 
         expect(csv_location).to eql("#{@dump_location}/#{@board_name}.csv")
     	end
@@ -41,7 +41,7 @@ describe LeankitConvert::ProcessBoard do
           {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "DONE", "DateTime"=>"2013/09/18 at 03:10:48 PM"}]]
         mock_card_info_and_history
         should_write_the_following_dates_to_csv("2013-09-15", "2013-09-16", "2013-09-17", "2013-09-18")
-        LeankitConvert::ProcessBoard.new(@files_and_json, @csv_file).to_csv(@location, @board_name, @mapping)
+        LeankitFilter::ProcessBoard.new(@files_and_json, @csv_file).to_csv(@location, @board_name, @mapping)
       end
 
     	it "considers the first ongoing history entry" do
@@ -53,7 +53,7 @@ describe LeankitConvert::ProcessBoard do
           {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "DONE", "DateTime"=>"2013/09/19 at 03:10:48 PM"}]]
         mock_card_info_and_history
         should_write_the_following_dates_to_csv("2013-09-15", "2013-09-16", "2013-09-17", "2013-09-19")
-    		LeankitConvert::ProcessBoard.new(@files_and_json, @csv_file).to_csv(@location, @board_name, @mapping)
+    		LeankitFilter::ProcessBoard.new(@files_and_json, @csv_file).to_csv(@location, @board_name, @mapping)
     	end
 
     	it "considers the last done history entry if there are more than one" do
@@ -65,7 +65,7 @@ describe LeankitConvert::ProcessBoard do
           {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "DONE", "DateTime"=>"2013/09/19 at 03:10:48 PM"}]]
         mock_card_info_and_history
         should_write_the_following_dates_to_csv("2013-09-15", "2013-09-16", "2013-09-17", "2013-09-19")
-    		LeankitConvert::ProcessBoard.new(@files_and_json, @csv_file).to_csv(@location, @board_name, @mapping)
+    		LeankitFilter::ProcessBoard.new(@files_and_json, @csv_file).to_csv(@location, @board_name, @mapping)
     	end
 
       it "should consider the last committed entry if it moved between TODO and Backlog before" do
@@ -78,7 +78,7 @@ describe LeankitConvert::ProcessBoard do
           {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "DONE", "DateTime"=>"2013/09/19 at 03:10:48 PM"}]]
         mock_card_info_and_history
         should_write_the_following_dates_to_csv("2013-09-15", "2013-09-18", "2013-09-18", "2013-09-19")
-        LeankitConvert::ProcessBoard.new(@files_and_json, @csv_file).to_csv(@location, @board_name, @mapping)
+        LeankitFilter::ProcessBoard.new(@files_and_json, @csv_file).to_csv(@location, @board_name, @mapping)
       end
 
       it "ignores the move in the same column" do
@@ -90,7 +90,7 @@ describe LeankitConvert::ProcessBoard do
           {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "DONE", "DateTime"=>"2013/09/19 at 03:10:48 PM"}]]
         mock_card_info_and_history
         should_write_the_following_dates_to_csv("2013-09-15", "2013-09-16", "2013-09-18", "2013-09-19")
-        LeankitConvert::ProcessBoard.new(@files_and_json, @csv_file).to_csv(@location, @board_name, @mapping)
+        LeankitFilter::ProcessBoard.new(@files_and_json, @csv_file).to_csv(@location, @board_name, @mapping)
       end
 
       it "is able to handle items moving back actions" do
@@ -102,7 +102,7 @@ describe LeankitConvert::ProcessBoard do
           {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "TODO", "DateTime"=>"2013/09/19 at 03:10:48 PM"}]]
         mock_card_info_and_history
         should_write_the_following_dates_to_csv("2013-09-15", "2013-09-16", "2013-09-18")
-        LeankitConvert::ProcessBoard.new(@files_and_json, @csv_file).to_csv(@location, @board_name, @mapping)
+        LeankitFilter::ProcessBoard.new(@files_and_json, @csv_file).to_csv(@location, @board_name, @mapping)
       end
 
       it "does not recognise done if it was moved back from the done column" do
@@ -114,7 +114,7 @@ describe LeankitConvert::ProcessBoard do
           {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "DOING:", "DateTime"=>"2013/09/19 at 03:10:48 PM"}]]
         mock_card_info_and_history
         should_write_the_following_dates_to_csv("2013-09-15", "2013-09-16", "2013-09-18")
-        LeankitConvert::ProcessBoard.new(@files_and_json, @csv_file).to_csv(@location, @board_name, @mapping)
+        LeankitFilter::ProcessBoard.new(@files_and_json, @csv_file).to_csv(@location, @board_name, @mapping)
       end
 
       it "handles portofolio boards" # do
