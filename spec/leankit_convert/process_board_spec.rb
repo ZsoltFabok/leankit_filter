@@ -116,29 +116,6 @@ describe LeankitFilter::ProcessBoard do
         should_write_the_following_dates_to_csv("2013-09-15", "2013-09-16", "2013-09-18")
         LeankitFilter::ProcessBoard.new(@files_and_json).process("boards.json", @location)
       end
-
-      it "handles portofolio boards" # do
-      #   card_info_1 = [{"Id" => @card_id + "1", "ParentCardId" => @card_id}]
-      #   card_info_2 = [{"Id" => @card_id + "2", "ParentCardId" => @card_id}]
-      #   card_info_3 = [{"Id" => @card_id + "3", "ParentCardId" => @card_id}]
-      #   card_history = [[{"CardId" => @card_id + "1", "Type" => "CardCreationEventDTO"},
-      #     {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "week", "DateTime"=>"2013/09/16 at 03:10:44 PM"},
-      #     {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "Done", "DateTime"=>"2013/09/19 at 03:16:48 PM"}]]
-      #   card_history_1 = [[{"CardId" => @card_id + "1", "Type" => "CardCreationEventDTO"},
-      #     {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "TODO", "DateTime"=>"2013/09/16 at 03:10:44 PM"},
-      #     {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "DOING:", "DateTime"=>"2013/09/18 at 03:16:48 PM"},
-      #     {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "DONE", "DateTime"=>"2013/09/19 at 03:16:48 PM"}]]
-      #   card_history_2 = [[{"CardId" => @card_id + "2", "Type" => "CardCreationEventDTO"},
-      #     {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "TODO", "DateTime"=>"2013/09/16 at 03:10:44 PM"},
-      #     {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "DOING:", "DateTime"=>"2013/09/18 at 03:16:48 PM"},
-      #     {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "DONE", "DateTime"=>"2013/09/19 at 03:16:48 PM"}]]
-      #   card_history_3 = [[{"CardId" => @card_id + "3", "Type" => "CardCreationEventDTO"},
-      #     {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "TODO", "DateTime"=>"2013/09/16 at 03:10:44 PM"},
-      #     {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "DOING:", "DateTime"=>"2013/09/18 at 03:16:48 PM"},
-      #     {"Type" => "CardMoveEventDTO", "ToLaneTitle" => "DONE", "DateTime"=>"2013/09/19 at 03:16:48 PM"}]]
-      # end
-
-      it "counts the backward movements"
     end
 
     def mock_card_info_and_history
