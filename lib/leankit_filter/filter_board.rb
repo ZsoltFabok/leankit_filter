@@ -29,9 +29,9 @@ module LeankitFilter
         work_item = {:id => card_id}
         history = @files_and_json.from_file(history_file_location)[0]
         work_item.merge!(get_first_appearance_date(:backlog, history, mapping))
-        work_item.merge!(get_first_appearance_date(:committed, history, mapping))
-        work_item.merge!(get_last_appearance_date(:started, history, mapping))
-        work_item.merge!(get_last_appearance_date(:finished, history, mapping))
+        work_item.merge!(find_committed(history, mapping))
+        work_item.merge!(get_first_appearance_date(:started, history, mapping))
+        work_item.merge!(find_finished(history, mapping))
         work_items << work_item
       end
       work_items
@@ -101,6 +101,30 @@ module LeankitFilter
         end
       end
       nil
+    end
+
+    def find_committed(history, mapping)
+      started_index = find_first_entry_in_history(history, mapping[:started.to_s])
+      if started_index
+        get_last_appearance_date(:committed, history[0..started_index-1], mapping)
+      else
+        {}
+      end
+    end
+
+    def find_finished(history, mapping)
+      column = :finished
+      pattern = mapping[column.to_s]
+      index = find_last_entry_in_history(history, pattern)
+      if index
+        next_relevant_entries = history[index+1..-1].select {|entry| relevant_event?(entry)}
+        if matching_event?(history[index-1], pattern)
+          return {column => get_date(history[index-1])}
+        elsif next_relevant_entries.empty? || next_relevant_entries[0]["ToLaneTitle"] == "Archive"
+          return {column => get_date(history[index])}
+        end
+      end
+      return {}
     end
   end
 end
