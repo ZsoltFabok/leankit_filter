@@ -1,10 +1,10 @@
 module LeankitFilter
-  class ProcessBoard
+  class FilterBoard
     def initialize(files_and_json)
       @files_and_json = files_and_json
     end
 
-    def process(boards_json, board_dump_location)
+    def filter(boards_json, board_dump_location)
       board_name = File.basename(board_dump_location)
       content = @files_and_json.from_file(boards_json)
       mapping = nil

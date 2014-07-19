@@ -12,7 +12,7 @@ module LeankitFilter
       boards_json = argv[0]
       board_dump_location = argv[1]
 
-      board_name, work_items = ProcessBoard.create.process(boards_json, board_dump_location)
+      board_name, work_items = FilterBoard.create.filter(boards_json, board_dump_location)
 
       if renderer == "csv"
         self.save_to_csv(board_dump_location, board_name, work_items)

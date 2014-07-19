@@ -1,6 +1,6 @@
 require 'spec_helper_with_integration'
 
-describe LeankitFilter::ProcessBoard do
+describe LeankitFilter::FilterBoard do
   context "unit" do
   	before(:each) do
       @files_and_json = double
@@ -24,6 +24,7 @@ describe LeankitFilter::ProcessBoard do
         mock_card_info_and_history
         mock_read_boards_json
         should_write_the_following_dates_to_csv("2013-09-15", "2013-09-16", "2013-09-16", "2013-09-17")
+        LeankitFilter::FilterBoard.new(@files_and_json).filter("boards.json", @location)
     	end
 
       it "recognises creation event" do
@@ -35,7 +36,7 @@ describe LeankitFilter::ProcessBoard do
         mock_card_info_and_history
         mock_read_boards_json
         should_write_the_following_dates_to_csv("2013-09-15", "2013-09-16", "2013-09-17", "2013-09-18")
-        LeankitFilter::ProcessBoard.new(@files_and_json).process("boards.json", @location)
+        LeankitFilter::FilterBoard.new(@files_and_json).filter("boards.json", @location)
       end
 
     	it "considers the first ongoing history entry" do
@@ -48,7 +49,7 @@ describe LeankitFilter::ProcessBoard do
         mock_card_info_and_history
         mock_read_boards_json
         should_write_the_following_dates_to_csv("2013-09-15", "2013-09-16", "2013-09-17", "2013-09-19")
-    		LeankitFilter::ProcessBoard.new(@files_and_json).process("boards.json", @location)
+    		LeankitFilter::FilterBoard.new(@files_and_json).filter("boards.json", @location)
     	end
 
     	it "considers the last done history entry if there are more than one" do
@@ -61,7 +62,7 @@ describe LeankitFilter::ProcessBoard do
         mock_card_info_and_history
         mock_read_boards_json
         should_write_the_following_dates_to_csv("2013-09-15", "2013-09-16", "2013-09-17", "2013-09-19")
-    		LeankitFilter::ProcessBoard.new(@files_and_json).process("boards.json", @location)
+    		LeankitFilter::FilterBoard.new(@files_and_json).filter("boards.json", @location)
     	end
 
       it "should consider the last committed entry if it moved between TODO and Backlog before" do
@@ -75,7 +76,7 @@ describe LeankitFilter::ProcessBoard do
         mock_card_info_and_history
         mock_read_boards_json
         should_write_the_following_dates_to_csv("2013-09-15", "2013-09-18", "2013-09-18", "2013-09-19")
-        LeankitFilter::ProcessBoard.new(@files_and_json).process("boards.json", @location)
+        LeankitFilter::FilterBoard.new(@files_and_json).filter("boards.json", @location)
       end
 
       it "ignores the move in the same column" do
@@ -88,7 +89,7 @@ describe LeankitFilter::ProcessBoard do
         mock_card_info_and_history
         mock_read_boards_json
         should_write_the_following_dates_to_csv("2013-09-15", "2013-09-16", "2013-09-18", "2013-09-19")
-        LeankitFilter::ProcessBoard.new(@files_and_json).process("boards.json", @location)
+        LeankitFilter::FilterBoard.new(@files_and_json).filter("boards.json", @location)
       end
 
       it "is able to handle items moving back actions" do
@@ -101,7 +102,7 @@ describe LeankitFilter::ProcessBoard do
         mock_card_info_and_history
         mock_read_boards_json
         should_write_the_following_dates_to_csv("2013-09-15", "2013-09-16", "2013-09-18")
-        LeankitFilter::ProcessBoard.new(@files_and_json).process("boards.json", @location)
+        LeankitFilter::FilterBoard.new(@files_and_json).filter("boards.json", @location)
       end
 
       it "does not recognise done if it was moved back from the done column" do
@@ -114,7 +115,7 @@ describe LeankitFilter::ProcessBoard do
         mock_card_info_and_history
         mock_read_boards_json
         should_write_the_following_dates_to_csv("2013-09-15", "2013-09-16", "2013-09-18")
-        LeankitFilter::ProcessBoard.new(@files_and_json).process("boards.json", @location)
+        LeankitFilter::FilterBoard.new(@files_and_json).filter("boards.json", @location)
       end
     end
 
