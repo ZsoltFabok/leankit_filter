@@ -5,5 +5,3 @@ group :development do
   gem 'debugger', '~> 1.6.8'
   gem 'coveralls', :require => false
 end
-
-gem 'coveralls', :require => false
