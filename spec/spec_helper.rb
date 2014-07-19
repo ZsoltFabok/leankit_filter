@@ -1,5 +1,6 @@
 require 'rspec'
 require 'simplecov'
+require 'coveralls'
 
 begin
   require "debugger"
@@ -10,7 +11,7 @@ end
 
 SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
   SimpleCov::Formatter::HTMLFormatter,
-  # Coveralls::SimpleCov::Formatter
+  Coveralls::SimpleCov::Formatter
 ]
 SimpleCov.start do
   add_filter '/spec/'
